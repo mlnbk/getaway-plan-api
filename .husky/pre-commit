@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$local_branch_name" = "main" ]; then
+    echo "You can't commit directly to main branch. Please create your own branch."
+    exit 1
+fi
+
+npx lint-staged && npm test
+
+RETURN=$?
+
+if [ $RETURN -ne 0 ];
+then
+  echo "@@@@@@ Pre-commit checks failed! Please fix your code before committing! @@@@@@"
+  exit $RETURN
+fi 
