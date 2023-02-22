@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
 
-import { AuthenticatedUser, JwtPayload } from 'src/types';
+import { AuthenticatedUser, JwtPayload } from '../types';
 
 import { UserService } from '../user/user.service';
 
