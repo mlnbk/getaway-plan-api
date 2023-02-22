@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { User } from 'src/types';
+import { User } from '../types';
 import { users } from '../mock-data';
 
 @Injectable()
