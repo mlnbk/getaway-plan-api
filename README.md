@@ -1,7 +1,9 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank">
-    <img src="https://github.com/mlnbk/getaway-plan-api/blob/main/GP-logo-transparent-green.png" alt="GetawayPlan Logo" />
-  </a>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/mlnbk/getaway-plan-api/blob/main/GP-logo-transparent-green.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/mlnbk/getaway-plan-api/blob/main/GP-logo-transparent-brown.png">
+    <img alt="GetawayPlan Logo" src="https://github.com/mlnbk/getaway-plan-api/blob/main/GP-logo-transparent-green.png">
+  </picture>
 </p>
 
 <!-- <p align="center">
