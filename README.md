@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://nestjs.com/" target="blank">
-    <img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" />
+    <img src="https://github.com/mlnbk/getaway-plan-api/blob/main/GP-logo-transparent-green.png" alt="GetawayPlan Logo" />
   </a>
 </p>
 
