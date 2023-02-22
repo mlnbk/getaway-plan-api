@@ -1,6 +1,6 @@
 {
   "editor.tabSize": 2,
-  "editor.detectIndentation": false,
+  "editor.detectIndentation": true,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
   "eslint.format.enable": true,
@@ -22,12 +22,9 @@
       "mode": "auto"
     }
   ],
-  "eslint.validate": [
-    "javascript",
-    "typescript"
-  ],
+  "eslint.validate": ["javascript", "typescript"],
   "search.exclude": {
     "**/node_modules": true,
-    "**/dist": true,
+    "**/dist": true
   }
 }
