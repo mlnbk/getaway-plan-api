@@ -24,6 +24,10 @@ With this API, users can create and manage travel plans, view and edit their use
 $ npm install
 ```
 
+## Environmental variables
+
+The neccessary environmental variables and their short description is available in `.env.template`.
+
 ## Running the app
 
 ```bash
