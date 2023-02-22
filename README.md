@@ -1,43 +1,32 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank">
+    <img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" />
+  </a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<!-- <p align="center">
+  A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.
+</p> -->
 
 # Getaway Plan API
+
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-This project aims to become be a travel planning app.
-The initial idea would be, that you could create a travel planning app that helps users plan, organize their trips.
-Many features are planned, including itinerary planning, budget tracking, message board between trip participats, travel recommendations and so on.
-
-The will use React for the frontend, NestJS for the backend, and a MongoDB database to store user data and travel information.
+This travel plan app API is a backend service for a travel planning application. It provides endpoints for user authentication, user management, and travel planning.<br />
+The API is built using the NestJS framework, which provides a scalable and modular architecture, as well as a range of features for security, validation, and performance.<br />
+The API uses JSON Web Tokens (JWT) for authentication and authorization, and includes a local strategy for validating user credentials.<br />
+The API is also designed with security in mind, including rate limiting, CORS support, and request validation with the class-validator library and the ValidationPipe middleware.<br />
+With this API, users can create and manage travel plans, view and edit their user profiles, and authenticate securely.
 
 ## Installation
 
 ```bash
 $ npm install
 ```
+
+## Environmental variables
+
+The neccessary environmental variables and their short description is available in `.env.template`.
 
 ## Running the app
 
@@ -65,16 +54,49 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Support
+# User Authentication
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The API supports user authentication using JSON Web Tokens (JWT) and local strategy.
 
-## Stay in touch
+## Local Strategy, JWT Authentication
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+To authenticate a user, send a POST request to /auth/login with the following body:
+
+```
+{
+  "email": "user@example.com",
+  "password": "password"
+}
+```
+
+If the email and password match a user in the database, the server will respond with a JWT token in the following format:
+
+```
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+}
+```
+
+Include the JWT token in the Authorization header of subsequent requests:
+
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+# Security Measures
+
+The API includes the following security measures:
+
+## Rate Limiting
+
+Requests to the API are rate limited to prevent abuse. If a client exceeds the rate limit, the server will respond with a `429 Too Many Requests` status code.
+
+## CORS
+
+The API is configured to only allow requests from specified domains. Requests from other domains will be blocked.
+
+## Request Validation
+
+All requests are validated using NestJS' ValidationPipe. Requests with invalid data will be rejected with a `400 Bad Request` status code.
 
 ## License
-
-Nest is [MIT licensed](LICENSE).
