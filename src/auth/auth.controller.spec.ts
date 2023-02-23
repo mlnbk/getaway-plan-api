@@ -1,40 +1,62 @@
-import { JwtService } from '@nestjs/jwt';
+import { Model } from 'mongoose';
 import { Test } from '@nestjs/testing';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { JwtService } from '@nestjs/jwt';
 
-import { AuthenticatedRequest } from '../types';
-import { UserService } from '../user/user.service';
+import { RequestWithUser, Role } from '../types';
+import {
+  closeInMongodConnection,
+  rootMongooseTestModule,
+} from '../../utils/test.util';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UserService } from '../user/user.service';
+import { User, UserDocument, UserSchema } from '../user/schema/user.schema';
 
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
+  let userModel: Model<User>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await Test.createTestingModule({
+      imports: [
+        rootMongooseTestModule(),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+      ],
       controllers: [AuthController],
       providers: [AuthService, JwtService, UserService],
     }).compile();
 
+    userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
     authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
   });
 
   describe('login', () => {
     it('should return a JWT token for a valid user', async () => {
-      const user = { email: 'test@example.com', password: 'password' };
+      const mockUser = await userModel.create({
+        email: 'test@example.com',
+        name: 'John',
+        password: 'password',
+        roles: [Role.user],
+      });
       const tokenResp = { access_token: 'token' };
 
       jest
         .spyOn(authService, 'login')
         .mockImplementation(async (user) => tokenResp);
 
-      const loginRequest = { user } as unknown as AuthenticatedRequest;
+      const loginRequest = { user: mockUser } as unknown as RequestWithUser;
       const result = await authController.login(loginRequest);
 
       expect(result).toBe(tokenResp);
-      expect(authService.login).toHaveBeenCalledWith(user);
+      expect(authService.login).toHaveBeenCalledWith(mockUser);
     });
+  });
+
+  afterAll(async () => {
+    await closeInMongodConnection();
   });
 });
