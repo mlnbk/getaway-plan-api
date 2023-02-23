@@ -1,12 +1,14 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 
-import { User } from '../types';
-import { users } from '../mock-data';
+import { User, UserDocument } from './schema/user.schema';
 
 @Injectable()
 export class UserService {
-  async findOneByEmail(email: string): Promise<User | undefined> {
-    // NOTE: temporary until DB is not present
-    return users.find((user) => user.email === email);
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async findOneByEmail(email: string): Promise<User | undefined | null> {
+    return this.userModel.findOne({ email });
   }
 }

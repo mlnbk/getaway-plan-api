@@ -1,3 +1,6 @@
+import { Request } from 'express';
+import { UserDocument } from './user/schema/user.schema';
+
 export type AuthenticatedUser = {
   _id: string;
   email: string;
@@ -12,15 +15,9 @@ export type JwtPayload = {
   roles: Role[];
 };
 
+export type RequestWithUser = Request & { user: UserDocument };
+
 export enum Role {
   admin = 'admin',
   user = 'user',
 }
-
-export type User = {
-  _id: string;
-  name: string;
-  email: string;
-  password: string;
-  roles: Role[];
-};
