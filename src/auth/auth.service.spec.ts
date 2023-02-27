@@ -56,6 +56,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         name: 'John',
         password: 'password',
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
       const expectedPayload = {
@@ -85,6 +86,7 @@ describe('AuthService', () => {
         email,
         name: 'John',
         password: hashedPassword,
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
 
@@ -120,6 +122,7 @@ describe('AuthService', () => {
         email,
         name: 'John',
         password: hashedPassword,
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
 

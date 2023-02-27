@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { Test } from '@nestjs/testing';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { omit } from 'lodash';
 
 import { AuthenticatedRequest, AuthenticatedUser, Role } from '../types';
 import {
@@ -11,6 +12,9 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserController } from './user.controller';
 import { User, UserDocument, UserSchema } from './schema/user.schema';
+import { UserService } from './user.service';
+import { UserDto } from './dto/user.dto';
+import { plainToClass } from 'class-transformer';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -24,6 +28,7 @@ describe('UserController', () => {
       ],
       controllers: [UserController],
       providers: [
+        UserService,
         {
           provide: JwtAuthGuard,
           useValue: { canActivate: jest.fn(() => true) },
@@ -45,6 +50,7 @@ describe('UserController', () => {
         email: 'test@example.com',
         name: 'John',
         password: 'password',
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
 
@@ -57,9 +63,15 @@ describe('UserController', () => {
       const request = {
         user: requestUser,
       } as unknown as AuthenticatedRequest;
-      const result = controller.getProfile(request);
+      const result = await controller.getProfile(request);
+      const expectedUser = plainToClass(UserDto, mockUser.toObject(), {
+        excludeExtraneousValues: true,
+      });
+      expectedUser.profilePic = mockUser
+        .toObject()
+        .profilePic.toString('base64');
 
-      expect(result).toEqual(requestUser);
+      expect(result).toEqual(expectedUser);
     });
   });
 

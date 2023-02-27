@@ -14,6 +14,9 @@ export class User {
   @Prop({ required: true })
   password!: string;
 
+  @Prop({ required: true })
+  profilePic!: Buffer;
+
   @Prop({ type: Array, required: true, enum: Role })
   roles!: Role[];
 }

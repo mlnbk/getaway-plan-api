@@ -8,7 +8,9 @@ import { User, UserDocument } from './schema/user.schema';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async findOneByEmail(email: string): Promise<User | undefined | null> {
+  async findOneByEmail(
+    email: string,
+  ): Promise<UserDocument | undefined | null> {
     return this.userModel.findOne({ email });
   }
 }
