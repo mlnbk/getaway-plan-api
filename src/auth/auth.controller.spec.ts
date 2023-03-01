@@ -40,6 +40,7 @@ describe('AuthController', () => {
         email: 'test@example.com',
         name: 'John',
         password: 'password',
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
       const tokenResp = { access_token: 'token' };

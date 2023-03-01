@@ -40,6 +40,7 @@ describe('UserService', () => {
         email: 'test@example.com',
         name: 'John',
         password: 'password',
+        profilePic: Buffer.from(' '),
         roles: [Role.user],
       });
 
