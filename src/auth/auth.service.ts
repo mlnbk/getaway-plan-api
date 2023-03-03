@@ -5,14 +5,14 @@ import { omit } from 'lodash';
 
 import { JwtPayload } from '../types';
 
-import { User, UserDocument } from '../user/schema/user.schema';
-import { UserService } from '../user/user.service';
+import { User, UserDocument } from '../users/schema/user.schema';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly usersService: UserService,
+    private readonly usersService: UsersService,
   ) {}
 
   private async checkPassword(

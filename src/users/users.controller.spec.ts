@@ -1,7 +1,6 @@
 import { Model } from 'mongoose';
 import { Test } from '@nestjs/testing';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
-import { omit } from 'lodash';
 
 import { AuthenticatedRequest, AuthenticatedUser, Role } from '../types';
 import {
@@ -10,14 +9,14 @@ import {
 } from '../../utils/test.util';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserController } from './user.controller';
+import { UsersController } from './users.controller';
 import { User, UserDocument, UserSchema } from './schema/user.schema';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { plainToClass } from 'class-transformer';
 
-describe('UserController', () => {
-  let controller: UserController;
+describe('UsersController', () => {
+  let controller: UsersController;
   let userModel: Model<User>;
 
   beforeAll(async () => {
@@ -26,9 +25,9 @@ describe('UserController', () => {
         rootMongooseTestModule(),
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
       ],
-      controllers: [UserController],
+      controllers: [UsersController],
       providers: [
-        UserService,
+        UsersService,
         {
           provide: JwtAuthGuard,
           useValue: { canActivate: jest.fn(() => true) },
@@ -41,7 +40,7 @@ describe('UserController', () => {
     }).compile();
 
     userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
-    controller = module.get<UserController>(UserController);
+    controller = module.get<UsersController>(UsersController);
   });
 
   describe('getProfile', () => {

@@ -9,10 +9,10 @@ import {
 } from '../../utils/test.util';
 
 import { User, UserDocument, UserSchema } from './schema/user.schema';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 
-describe('UserService', () => {
-  let userService: UserService;
+describe('UsersService', () => {
+  let usersService: UsersService;
   let userModel: Model<User>;
 
   beforeAll(async () => {
@@ -22,7 +22,7 @@ describe('UserService', () => {
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
       ],
       providers: [
-        UserService,
+        UsersService,
         {
           provide: getModelToken(User.name),
           useValue: userModel,
@@ -31,7 +31,7 @@ describe('UserService', () => {
     }).compile();
 
     userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
-    userService = module.get<UserService>(UserService);
+    usersService = module.get<UsersService>(UsersService);
   });
 
   describe('findOneByEmail', () => {
@@ -44,13 +44,13 @@ describe('UserService', () => {
         roles: [Role.user],
       });
 
-      const foundUser = await userService.findOneByEmail(mockUser.email);
+      const foundUser = await usersService.findOneByEmail(mockUser.email);
       expect(foundUser?.email).toEqual(mockUser.email);
     });
 
     it('should return undefined if no user found with matching email', async () => {
       const email = 'nonexisting@example.com';
-      const user = await userService.findOneByEmail(email);
+      const user = await usersService.findOneByEmail(email);
       expect(user).toBeNull();
     });
   });

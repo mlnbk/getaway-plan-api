@@ -10,14 +10,14 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '../types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { plainToClass } from 'class-transformer';
 import { UserDto } from './dto/user.dto';
 
-@ApiTags('user')
-@Controller('user')
-export class UserController {
-  constructor(private readonly usersService: UserService) {}
+@ApiTags('users')
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
