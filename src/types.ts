@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { UserDocument } from './user/schema/user.schema';
+import { UserDocument } from './users/schema/user.schema';
 
 export type AuthenticatedUser = {
   _id: string;

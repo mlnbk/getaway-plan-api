@@ -12,13 +12,13 @@ import {
 } from '../../utils/test.util';
 
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
-import { User, UserDocument, UserSchema } from '../user/schema/user.schema';
+import { UsersService } from '../users/users.service';
+import { User, UserDocument, UserSchema } from '../users/schema/user.schema';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let jwtService: JwtService;
-  let userService: UserService;
+  let usersService: UsersService;
   let userModel: Model<User>;
 
   beforeAll(async () => {
@@ -36,7 +36,7 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: UserService,
+          provide: UsersService,
           useValue: {
             findOneByEmail: jest.fn(),
           },
@@ -47,7 +47,7 @@ describe('AuthService', () => {
     userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
     authService = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
-    userService = module.get<UserService>(UserService);
+    usersService = module.get<UsersService>(UsersService);
   });
 
   describe('login', () => {
@@ -90,11 +90,11 @@ describe('AuthService', () => {
         roles: [Role.user],
       });
 
-      jest.spyOn(userService, 'findOneByEmail').mockResolvedValue(mockUser);
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(mockUser);
 
       const result = await authService.validateUser(email, password);
 
-      expect(userService.findOneByEmail).toHaveBeenCalledWith(email);
+      expect(usersService.findOneByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual(
         expect.objectContaining(omit(mockUser, 'password')),
       );
@@ -105,7 +105,7 @@ describe('AuthService', () => {
       const password = 'password';
 
       // eslint-disable-next-line unicorn/no-useless-undefined
-      jest.spyOn(userService, 'findOneByEmail').mockResolvedValue(undefined);
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(undefined);
 
       await expect(authService.validateUser(email, password)).rejects.toThrow(
         'Wrong email or password',
@@ -126,7 +126,7 @@ describe('AuthService', () => {
         roles: [Role.user],
       });
 
-      jest.spyOn(userService, 'findOneByEmail').mockResolvedValue(mockUser);
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(mockUser);
 
       await expect(
         authService.validateUser(email, password),

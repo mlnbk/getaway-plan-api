@@ -11,8 +11,8 @@ import {
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
-import { User, UserDocument, UserSchema } from '../user/schema/user.schema';
+import { UsersService } from '../users/users.service';
+import { User, UserDocument, UserSchema } from '../users/schema/user.schema';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -26,7 +26,7 @@ describe('AuthController', () => {
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
       ],
       controllers: [AuthController],
-      providers: [AuthService, JwtService, UserService],
+      providers: [AuthService, JwtService, UsersService],
     }).compile();
 
     userModel = module.get<Model<UserDocument>>(getModelToken(User.name));
