@@ -1,5 +1,13 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -23,6 +31,17 @@ export class TripsController {
     @Request() request: AuthenticatedRequest,
     @Body() createTripDto: CreateTripDto,
   ) {
-    await this.tripsService.createTrip(request.user._id, createTripDto);
+    const tripDocument = await this.tripsService.createTrip(
+      request.user._id,
+      createTripDto,
+    );
+    if (!tripDocument) {
+      throw new BadRequestException(
+        `Creating trip failed for user: ${request.user._id}`,
+      );
+    }
+    return plainToClass(TripDto, tripDocument.toObject(), {
+      excludeExtraneousValues: true,
+    });
   }
 }
