@@ -9,7 +9,9 @@ import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersController } from './users/users.controller';
-import { UserModule } from './users/users.module';
+import { UsersModule } from './users/users.module';
+import { TripsController } from './trips/trips.controller';
+import { TripsModule } from './trips/trips.module';
 
 @Module({
   imports: [
@@ -26,9 +28,15 @@ import { UserModule } from './users/users.module';
       inject: [ConfigService],
     }),
     AuthModule,
-    UserModule,
+    UsersModule,
+    TripsModule,
   ],
-  controllers: [AppController, AuthController, UsersController],
+  controllers: [
+    AppController,
+    AuthController,
+    UsersController,
+    TripsController,
+  ],
   providers: [
     AppService,
     {

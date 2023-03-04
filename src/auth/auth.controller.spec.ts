@@ -45,9 +45,7 @@ describe('AuthController', () => {
       });
       const tokenResp = { access_token: 'token' };
 
-      jest
-        .spyOn(authService, 'login')
-        .mockImplementation(async (user) => tokenResp);
+      jest.spyOn(authService, 'login').mockImplementation((user) => tokenResp);
 
       const loginRequest = { user: mockUser } as unknown as RequestWithUser;
       const result = await authController.login(loginRequest);

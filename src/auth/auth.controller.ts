@@ -1,12 +1,12 @@
 import { Controller, Logger, Post, Request, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { RequestWithUser } from '../types';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from '../decorators/public.decorator';
 
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -17,7 +17,8 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
-  @ApiBody({ type: LoginDto })
+  @ApiBody({ type: LoginRequestDto })
+  @ApiOkResponse({ type: LoginResponseDto })
   @Post('/login')
   async login(@Request() request: RequestWithUser) {
     this.logger.debug(`New login: ${request.user?.email}`);
