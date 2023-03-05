@@ -84,23 +84,31 @@ describe('TripsService', () => {
     it('should return trips for a user without any filters', async () => {
       const userId = new Types.ObjectId().toHexString();
       const trips = await tripModel.create([
-        { user: new Types.ObjectId(userId), name: 'Trip 1' },
-        { user: new Types.ObjectId(userId), name: 'Trip 2' },
+        { user: new Types.ObjectId(userId), name: 'Trip 0' },
+        { user: new Types.ObjectId(userId), name: 'Trip 01' },
         {
           user: new Types.ObjectId().toHexString(),
           name: 'Another User Trip',
         },
       ]);
 
-      const result = await tripsService.getTripsForUser({ userId });
+      const result = await tripsService.getTripsForUser({
+        userId,
+        skip: 0,
+        limit: 10,
+        sortBy: 'name',
+        asc: true,
+      });
 
-      const plainResult = plainToClass(TripDto, result, {
+      const plainResult = plainToClass(TripDto, result.trips, {
         excludeExtraneousValues: true,
       });
       const plainTrips = plainToClass(TripDto, [trips[0], trips[1]], {
         excludeExtraneousValues: true,
       });
 
+      expect(result.total).toEqual(2);
+      expect(result.hasMore).toBeFalsy();
       expect(plainResult).toEqual(plainTrips);
     });
 
@@ -156,9 +164,13 @@ describe('TripsService', () => {
       const result = await tripsService.getTripsForUser({
         userId: userId.toHexString(),
         filters,
+        skip: 0,
+        limit: 10,
+        sortBy: 'name',
+        asc: true,
       });
 
-      const plainResult = plainToClass(TripDto, result, {
+      const plainResult = plainToClass(TripDto, result.trips, {
         excludeExtraneousValues: true,
       });
       const plainTrips = plainToClass(
@@ -169,6 +181,8 @@ describe('TripsService', () => {
         },
       );
 
+      expect(result.total).toBe(4);
+      expect(result.hasMore).toBe(false);
       expect(plainResult).toEqual(plainTrips);
     });
   });

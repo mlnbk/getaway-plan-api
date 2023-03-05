@@ -14,8 +14,12 @@ import { plainToClass } from 'class-transformer';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { AuthenticatedRequest } from '../types';
+import { GetTripsForUserResponse } from './types';
 import { CreateTripDto } from './dto/create-trip.dto';
-import { GetTripsForUserDto } from './dto/get-trips-for-user.dto';
+import {
+  GetTripsForUserDto,
+  GetTripsForUserFiltersDto,
+} from './dto/get-trips-for-user.dto';
 import { TripDto } from './dto/trip.dto';
 
 import { TripsService } from './trips.service';
@@ -51,20 +55,30 @@ export class TripsController {
   @Get('/my-trips')
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ type: GetTripsForUserDto })
-  @ApiOkResponse({ type: [TripDto] })
+  @ApiOkResponse({ type: GetTripsForUserResponse })
   async getTripsForUser(
     @Request() request: AuthenticatedRequest,
-    @Query() getTripsForUserDto?: GetTripsForUserDto,
+    @Query('skip') skip: number,
+    @Query('limit') limit: number,
+    @Query('sortBy') sortBy: string,
+    @Query('asc') asc: boolean,
+    @Query('filters') filters?: GetTripsForUserFiltersDto,
   ) {
-    const tripDocuments = await this.tripsService.getTripsForUser({
+    const tripDocumentsResponse = await this.tripsService.getTripsForUser({
       userId: request.user._id,
-      filters: getTripsForUserDto,
+      filters,
+      skip,
+      limit,
     });
 
-    return tripDocuments.map((tripDocument) =>
-      plainToClass(TripDto, tripDocument.toObject(), {
-        excludeExtraneousValues: true,
-      }),
-    );
+    return {
+      trips: tripDocumentsResponse.trips.map((tripDocument) =>
+        plainToClass(TripDto, tripDocument.toObject(), {
+          excludeExtraneousValues: true,
+        }),
+      ),
+      total: tripDocumentsResponse.total,
+      hasMore: tripDocumentsResponse.hasMore,
+    };
   }
 }

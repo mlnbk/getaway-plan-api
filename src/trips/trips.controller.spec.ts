@@ -1,4 +1,4 @@
-import { FilterQuery, Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -9,15 +9,13 @@ import {
   rootMongooseTestModule,
 } from '../../utils/test.util';
 
-import { AuthenticatedRequest, Role, TripStatus } from '../types';
+import { AuthenticatedRequest, Role } from '../types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { TripDto } from './dto/trip.dto';
 import { Trip, TripDocument, TripSchema } from './schema/trip.schema';
 
 import { TripsController } from './trips.controller';
 import { TripsService } from './trips.service';
-import { GetTripsForUserParameters } from './types';
-import { GetTripsForUserDto } from './dto/get-trips-for-user.dto';
 
 describe('TripsController', () => {
   let tripsController: TripsController;
@@ -31,10 +29,6 @@ describe('TripsController', () => {
         MongooseModule.forFeature([{ name: Trip.name, schema: TripSchema }]),
       ],
       providers: [
-        // {
-        //   provide: TripsService,
-        //   useValue: tripsService,
-        // },
         TripsService,
         {
           provide: getModelToken(Trip.name),
@@ -111,9 +105,13 @@ describe('TripsController', () => {
       ]);
       const response = await tripsController.getTripsForUser(
         mockRequest as AuthenticatedRequest,
+        0, // skip
+        100, // limit
+        'name',
+        true,
       );
 
-      const plainResult = plainToClass(TripDto, response, {
+      const plainResult = plainToClass(TripDto, response.trips, {
         excludeExtraneousValues: true,
       });
       const plainTrips = plainToClass(TripDto, [trips[0], trips[1]], {
