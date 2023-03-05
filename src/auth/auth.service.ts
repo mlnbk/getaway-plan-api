@@ -7,6 +7,7 @@ import { JwtPayload } from '../types';
 
 import { User, UserDocument } from '../users/schema/user.schema';
 import { UsersService } from '../users/users.service';
+import { LoginResponseDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,7 @@ export class AuthService {
     return bcrypt.compare(password, hashed);
   }
 
-  async login(user: UserDocument) {
+  login(user: UserDocument): LoginResponseDto {
     const payload: JwtPayload = {
       sub: String(user._id),
       email: user.email.toLowerCase(),

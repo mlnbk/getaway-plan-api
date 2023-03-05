@@ -6,7 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedRequest } from '../types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,11 +16,12 @@ import { UserDto } from './dto/user.dto';
 
 @ApiTags('users')
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/me')
-  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: UserDto })
   async getProfile(@Request() request: AuthenticatedRequest) {
     const foundUser = await this.usersService.findOneByEmail(
       request.user.email,

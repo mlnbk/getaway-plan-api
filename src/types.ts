@@ -21,3 +21,9 @@ export enum Role {
   admin = 'admin',
   user = 'user',
 }
+
+export enum TripStatus {
+  past = 'past',
+  current = 'current',
+  upcoming = 'upcoming',
+}
