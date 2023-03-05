@@ -27,18 +27,26 @@ export class TripsService {
   }: GetTripsForUserParameters): Promise<TripDocument[]> {
     const query: FilterQuery<TripDocument> = {
       user: new Types.ObjectId(userId),
+      $or: [],
     };
 
     if (filters) {
       const { destinations, invitedUsers, status } = filters;
+      const queries: Record<string, unknown>[] = [];
       if (destinations) {
-        query.destinations = destinations;
+        queries.push({ destinations: { $in: destinations } });
       }
       if (invitedUsers) {
-        query.invitedUsers = invitedUsers.map(
-          (invitedUserId) => new Types.ObjectId(invitedUserId),
-        );
+        queries.push({
+          invitedUsers: invitedUsers.map(
+            (invitedUserId) => new Types.ObjectId(invitedUserId),
+          ),
+        });
       }
+      if (queries.length > 0) {
+        query.$or?.push({ $or: queries });
+      }
+
       if (status?.length) {
         const currentDate = new Date();
         const statusQueries: Record<string, unknown>[] = [];
@@ -58,9 +66,12 @@ export class TripsService {
           statusQueries.push({ startDate: { $gt: currentDate } });
         }
 
-        query.$or = statusQueries;
+        if (statusQueries.length > 0) {
+          query.$or?.push({ $or: statusQueries });
+        }
       }
     }
+
     // eslint-disable-next-line unicorn/no-array-callback-reference
     return this.tripModel.find(query);
   }

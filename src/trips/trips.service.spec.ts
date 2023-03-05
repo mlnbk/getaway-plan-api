@@ -1,7 +1,8 @@
 import { Test } from '@nestjs/testing';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { plainToClass } from 'class-transformer';
+import * as dayjs from 'dayjs';
 
 import {
   closeInMongodConnection,
@@ -12,7 +13,9 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { TripDto } from './dto/trip.dto';
 import { Trip, TripDocument, TripSchema } from './schema/trip.schema';
 
+import { GetTripFilter } from './types';
 import { TripsService } from './trips.service';
+import { TripStatus } from '../types';
 
 describe('TripsService', () => {
   let tripsService: TripsService;
@@ -74,6 +77,99 @@ describe('TripsService', () => {
       });
 
       expect(plainResult).toEqual(plainTripDocument);
+    });
+  });
+
+  describe('getTripsForUser', () => {
+    it('should return trips for a user without any filters', async () => {
+      const userId = new Types.ObjectId().toHexString();
+      const trips = await tripModel.create([
+        { user: new Types.ObjectId(userId), name: 'Trip 1' },
+        { user: new Types.ObjectId(userId), name: 'Trip 2' },
+        {
+          user: new Types.ObjectId().toHexString(),
+          name: 'Another User Trip',
+        },
+      ]);
+
+      const result = await tripsService.getTripsForUser({ userId });
+
+      const plainResult = plainToClass(TripDto, result, {
+        excludeExtraneousValues: true,
+      });
+      const plainTrips = plainToClass(TripDto, [trips[0], trips[1]], {
+        excludeExtraneousValues: true,
+      });
+
+      expect(plainResult).toEqual(plainTrips);
+    });
+
+    it('should return trips for a user with filters', async () => {
+      const userId = new Types.ObjectId();
+      const invitedUserId = new Types.ObjectId();
+      const filters: GetTripFilter = {
+        destinations: [
+          { country: 'France', city: 'Paris' },
+          { country: 'Germany', city: 'Berlin' },
+        ],
+        invitedUsers: [invitedUserId.toHexString()],
+        status: [TripStatus.current, TripStatus.upcoming],
+      };
+      const trips = await tripModel.create([
+        {
+          user: userId,
+          name: 'Trip 1',
+          destinations: [{ country: 'France', city: 'Paris' }],
+          endDate: dayjs().subtract(1, 'day'),
+        },
+        {
+          user: userId,
+          name: 'Trip 2',
+          destinations: [{ country: 'Germany', city: 'Berlin' }],
+          startDate: dayjs().subtract(1, 'day'),
+          endDate: dayjs().add(1, 'day'),
+        },
+        {
+          user: userId,
+          name: 'Trip 3',
+          destinations: [{ country: 'Germany', city: 'Berlin' }],
+          startDate: dayjs().add(1, 'day'),
+        },
+        {
+          user: userId,
+          name: 'Trip 4',
+          destinations: [{ country: 'Norwegia', city: 'Oslo' }],
+          invitedUsers: [invitedUserId],
+        },
+        {
+          user: userId,
+          name: 'Trip 5',
+          destinations: [{ country: 'Finland', city: 'Helsinki' }],
+        },
+        {
+          user: new Types.ObjectId().toHexString(),
+          name: 'Another User Trip',
+          destinations: [{ country: 'France', city: 'Paris' }],
+        },
+      ]);
+
+      const result = await tripsService.getTripsForUser({
+        userId: userId.toHexString(),
+        filters,
+      });
+
+      const plainResult = plainToClass(TripDto, result, {
+        excludeExtraneousValues: true,
+      });
+      const plainTrips = plainToClass(
+        TripDto,
+        [trips[0], trips[1], trips[2], trips[3]],
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+
+      expect(plainResult).toEqual(plainTrips);
     });
   });
 

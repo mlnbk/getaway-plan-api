@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
@@ -9,27 +9,20 @@ import {
   rootMongooseTestModule,
 } from '../../utils/test.util';
 
-import { AuthenticatedRequest, Role } from '../types';
+import { AuthenticatedRequest, Role, TripStatus } from '../types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { TripDto } from './dto/trip.dto';
 import { Trip, TripDocument, TripSchema } from './schema/trip.schema';
 
 import { TripsController } from './trips.controller';
 import { TripsService } from './trips.service';
+import { GetTripsForUserParameters } from './types';
+import { GetTripsForUserDto } from './dto/get-trips-for-user.dto';
 
 describe('TripsController', () => {
   let tripsController: TripsController;
   let tripModel: Model<Trip>;
-  const tripsService = {
-    createTrip: jest.fn(),
-  };
-  const mockRequest = {
-    user: {
-      _id: String(new Types.ObjectId()),
-      email: 'terst@test.com',
-      roles: [Role.user],
-    },
-  };
+  let tripsService: TripsService;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -38,10 +31,11 @@ describe('TripsController', () => {
         MongooseModule.forFeature([{ name: Trip.name, schema: TripSchema }]),
       ],
       providers: [
-        {
-          provide: TripsService,
-          useValue: tripsService,
-        },
+        // {
+        //   provide: TripsService,
+        //   useValue: tripsService,
+        // },
+        TripsService,
         {
           provide: getModelToken(Trip.name),
           useValue: tripModel,
@@ -53,36 +47,22 @@ describe('TripsController', () => {
 
     tripModel = module.get<Model<TripDocument>>(getModelToken(Trip.name));
     tripsController = module.get<TripsController>(TripsController);
+    tripsService = module.get<TripsService>(TripsService);
   });
 
   describe('createTrip', () => {
+    const mockRequest = {
+      user: {
+        _id: String(new Types.ObjectId()),
+        email: 'test@test.com',
+        roles: [Role.user],
+      },
+    };
     const mockCreateTripDto = plainToClass(CreateTripDto, {
       name: 'Test Trip',
       startDate: new Date('2023-03-01T00:00:00.000Z'),
       endDate: new Date('2023-03-07T00:00:00.000Z'),
       destinations: [{ country: 'Test Country' }],
-    });
-
-    it('should create a trip successfully', async () => {
-      const mockTripDto = await tripModel.create({
-        name: 'Test Trip',
-        startDate: new Date('2023-03-01T00:00:00.000Z'),
-        endDate: new Date('2023-03-07T00:00:00.000Z'),
-        destinations: [{ country: 'Test Country' }],
-        user: mockRequest.user._id,
-      });
-
-      tripsService.createTrip.mockResolvedValueOnce(mockTripDto);
-
-      await tripsController.createTrip(
-        mockRequest as AuthenticatedRequest,
-        mockCreateTripDto,
-      );
-
-      expect(tripsService.createTrip).toHaveBeenCalledWith(
-        mockRequest.user._id,
-        mockCreateTripDto,
-      );
     });
 
     it('should return the created trip', async () => {
@@ -93,8 +73,6 @@ describe('TripsController', () => {
         destinations: [{ country: 'Test Country' }],
         user: mockRequest.user._id,
       });
-
-      tripsService.createTrip.mockResolvedValueOnce(mockTripDocument);
 
       const plainTripDocument = plainToClass(
         TripDto,
@@ -109,6 +87,40 @@ describe('TripsController', () => {
       );
 
       expect(result).toEqual(plainTripDocument);
+    });
+  });
+
+  describe('getTripsForUser', () => {
+    const userId = new Types.ObjectId();
+    const mockRequest = {
+      user: {
+        _id: userId.toHexString(),
+        email: 'test@test.com',
+        roles: [Role.user],
+      },
+    };
+
+    it('should return an array of trip dtos', async () => {
+      const trips = await tripModel.create([
+        { user: userId, name: 'Trip 1' },
+        { user: userId, name: 'Trip 2' },
+        {
+          user: new Types.ObjectId().toHexString(),
+          name: 'Another User Trip',
+        },
+      ]);
+      const response = await tripsController.getTripsForUser(
+        mockRequest as AuthenticatedRequest,
+      );
+
+      const plainResult = plainToClass(TripDto, response, {
+        excludeExtraneousValues: true,
+      });
+      const plainTrips = plainToClass(TripDto, [trips[0], trips[1]], {
+        excludeExtraneousValues: true,
+      });
+
+      expect(plainResult).toEqual(plainTrips);
     });
   });
 

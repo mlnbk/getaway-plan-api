@@ -54,7 +54,7 @@ export class TripsController {
   @ApiOkResponse({ type: [TripDto] })
   async getTripsForUser(
     @Request() request: AuthenticatedRequest,
-    @Query() getTripsForUserDto: GetTripsForUserDto,
+    @Query() getTripsForUserDto?: GetTripsForUserDto,
   ) {
     const tripDocuments = await this.tripsService.getTripsForUser({
       userId: request.user._id,
