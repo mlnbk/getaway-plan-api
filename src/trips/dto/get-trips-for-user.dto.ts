@@ -7,14 +7,15 @@ import { IsNonPrimitiveArray } from '../../utils/custom-validator';
 import { TripStatus } from '../../types';
 
 import { DestinationDto } from './destination.dto';
+import { PaginationDto } from './pagination.dto';
 
-export class GetTripsForUserDto {
+export class GetTripsForUserFiltersDto {
   @ApiProperty()
   @IsOptional()
   @IsMongoId({ each: true })
   invitedUsers?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ enum: TripStatus, default: [], isArray: true })
   @IsOptional()
   status?: TripStatus[];
 
@@ -24,4 +25,10 @@ export class GetTripsForUserDto {
   @IsNonPrimitiveArray()
   @Type(() => DestinationDto)
   destinations?: DestinationDto[];
+}
+export class GetTripsForUserDto extends PaginationDto {
+  @ApiProperty()
+  @IsOptional()
+  @Type(() => GetTripsForUserFiltersDto)
+  filters?: GetTripsForUserFiltersDto;
 }

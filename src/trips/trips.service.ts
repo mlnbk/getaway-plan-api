@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 
 import { CreateTripDto } from './dto/create-trip.dto';
-import { GetTripsForUserParameters } from './types';
+import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
 import { Trip, TripDocument } from './schema/trip.schema';
 import { TripStatus } from '../types';
 
@@ -24,7 +24,11 @@ export class TripsService {
   async getTripsForUser({
     userId,
     filters,
-  }: GetTripsForUserParameters): Promise<TripDocument[]> {
+    skip,
+    limit,
+    sortBy,
+    asc,
+  }: GetTripsForUserParameters): Promise<GetTripsForUserResponse> {
     const query: FilterQuery<TripDocument> = {
       user: new Types.ObjectId(userId),
       $or: [],
@@ -73,6 +77,14 @@ export class TripsService {
     }
 
     // eslint-disable-next-line unicorn/no-array-callback-reference
-    return this.tripModel.find(query);
+    const trips = await this.tripModel.find(
+      query,
+      {},
+      { skip, limit, sort: { [sortBy ?? 'createdAt']: asc ? 'asc' : 'desc' } },
+    );
+    const total = await this.tripModel.countDocuments(query);
+
+    const hasMore = total > skip + limit ? true : false;
+    return { total, trips, hasMore };
   }
 }
