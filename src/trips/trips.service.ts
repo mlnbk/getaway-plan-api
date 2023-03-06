@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
+import { DeleteResult } from 'mongodb';
 
 import { CreateTripDto } from './dto/create-trip.dto';
 import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
@@ -19,6 +20,14 @@ export class TripsService {
       ...trip,
       user: new Types.ObjectId(userId),
     });
+  }
+
+  async deleteTrip(tripId: string): Promise<DeleteResult> {
+    return this.tripModel.deleteOne({ _id: new Types.ObjectId(tripId) });
+  }
+
+  async getTripById(tripId: string): Promise<TripDocument | null> {
+    return this.tripModel.findById(new Types.ObjectId(tripId));
   }
 
   async getTripsForUser({

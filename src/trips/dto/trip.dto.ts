@@ -10,4 +10,10 @@ export class TripDto extends CreateTripDto {
   @Expose()
   @Type(() => String)
   user!: string;
+
+  @ApiProperty()
+  @IsMongoId()
+  @Expose()
+  @Type(() => String)
+  _id!: string;
 }
