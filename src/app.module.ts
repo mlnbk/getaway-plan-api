@@ -17,8 +17,8 @@ import { TripsModule } from './trips/trips.module';
   imports: [
     ConfigModule.forRoot(),
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+      ttl: 30,
+      limit: 20,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

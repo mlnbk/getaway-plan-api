@@ -25,7 +25,7 @@ async function bootstrap() {
   );
   app.enableCors({
     origin: configService.get('WEB_URL'),
-    methods: 'GET, PUT, POST',
+    methods: 'GET, DELETE, POST, PUT',
     allowedHeaders: 'Content-Type, Authorization',
   });
   await app.listen(3000);
