@@ -30,6 +30,9 @@ export class Trip {
 
   @Prop({ type: BudgetSchema })
   budget?: Budget;
+
+  @Prop()
+  pictures?: string[];
 }
 
 export type TripDocument = HydratedDocument<Trip>;

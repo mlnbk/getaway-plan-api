@@ -10,7 +10,11 @@ import {
   Post,
   Query,
   Request,
+  UploadedFile,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -37,6 +41,8 @@ import {
 import { TripDto } from './dto/trip.dto';
 
 import { TripsService } from './trips.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { TransformJsonPipe } from 'utils/transform-json.pipe';
 
 @ApiTags('trips')
 @Controller('trips')
@@ -70,24 +76,28 @@ export class TripsController {
 
   @Post('/add')
   @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: CreateTripDto })
+  @UseInterceptors(FileInterceptor('tripPic'))
   @ApiOkResponse({ type: TripDto })
   async createTrip(
     @Request() request: AuthenticatedRequest,
-    @Body() createTripDto: CreateTripDto,
+    @Body('tripInfo', new TransformJsonPipe()) tripInfo: CreateTripDto,
+    @UploadedFile() tripPic: Express.Multer.File,
   ) {
-    const tripDocument = await this.tripsService.createTrip(
-      request.user._id,
-      createTripDto,
-    );
-    if (!tripDocument) {
-      throw new BadRequestException(
-        `Creating trip failed for user: ${request.user._id}`,
-      );
-    }
-    return plainToClass(TripDto, tripDocument.toObject(), {
-      excludeExtraneousValues: true,
-    });
+    console.log('controller, tripPic, tripInfo', tripPic, tripInfo);
+    // return;
+    // const tripDocument = await this.tripsService.createTrip(
+    //   request.user._id,
+    //   tripInfo,
+    //   tripPic,
+    // );
+    // if (!tripDocument) {
+    //   throw new BadRequestException(
+    //     `Creating trip failed for user: ${request.user._id}`,
+    //   );
+    // }
+    // return plainToClass(TripDto, tripDocument.toObject(), {
+    //   excludeExtraneousValues: true,
+    // });
   }
 
   @Get('/my-trips')
