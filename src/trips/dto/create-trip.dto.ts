@@ -47,9 +47,10 @@ export class CreateTripDto {
 
   @ApiProperty({ type: [DestinationDto] })
   @ValidateNested({ each: true })
-  @Transform((destination) => {
-    console.log('createTripDto, transformFn,', destination);
-    plainToClass(DestinationDto, JSON.parse(String(destination.value)));
+  @Transform((destinations) => {
+    return destinations.value.map((destination: any) =>
+      plainToClass(DestinationDto, destination),
+    );
   })
   @IsNonPrimitiveArray()
   @Type(() => DestinationDto)

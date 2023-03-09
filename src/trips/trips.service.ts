@@ -36,9 +36,10 @@ export class TripsService {
         Bucket: this.configService.get('S3_PICTURES_BUCKET') ?? '',
         file: tripPic,
       });
+      console.log('uploadResult', uploadResult);
       if (uploadResult) {
         createParameters.pictures = [];
-        createParameters.pictures.push(uploadResult.Location);
+        createParameters.pictures.push(uploadResult);
       }
     }
 

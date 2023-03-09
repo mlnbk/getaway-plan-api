@@ -14,10 +14,12 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiParam,
   ApiQuery,
@@ -27,7 +29,7 @@ import { plainToClass } from 'class-transformer';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-import { AuthenticatedRequest } from '../types';
+import { AuthenticatedRequest, validationPipeOptions } from '../types';
 import { GetTripsForUserResponse } from './types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import {
@@ -51,6 +53,7 @@ export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
 
   @Delete('/:tripId')
+  @UsePipes(new ValidationPipe(validationPipeOptions))
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: DeleteTripResponseDto })
   async deleteTripById(
@@ -77,31 +80,36 @@ export class TripsController {
   @Post('/add')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('tripPic'))
+  @ApiConsumes('multipart/form-data')
   @ApiOkResponse({ type: TripDto })
   async createTrip(
     @Request() request: AuthenticatedRequest,
-    @Body('tripInfo', new TransformJsonPipe()) tripInfo: CreateTripDto,
+    @Body(
+      'tripInfo',
+      new TransformJsonPipe(),
+      new ValidationPipe(validationPipeOptions),
+    )
+    tripInfo: CreateTripDto,
     @UploadedFile() tripPic: Express.Multer.File,
   ) {
-    console.log('controller, tripPic, tripInfo', tripPic, tripInfo);
-    // return;
-    // const tripDocument = await this.tripsService.createTrip(
-    //   request.user._id,
-    //   tripInfo,
-    //   tripPic,
-    // );
-    // if (!tripDocument) {
-    //   throw new BadRequestException(
-    //     `Creating trip failed for user: ${request.user._id}`,
-    //   );
-    // }
-    // return plainToClass(TripDto, tripDocument.toObject(), {
-    //   excludeExtraneousValues: true,
-    // });
+    const tripDocument = await this.tripsService.createTrip(
+      request.user._id,
+      tripInfo,
+      tripPic,
+    );
+    if (!tripDocument) {
+      throw new BadRequestException(
+        `Creating trip failed for user: ${request.user._id}`,
+      );
+    }
+    return plainToClass(TripDto, tripDocument.toObject(), {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get('/my-trips')
   @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe(validationPipeOptions))
   @ApiQuery({ type: GetTripsForUserDto })
   @ApiOkResponse({ type: GetTripsForUserResponse })
   async getTripsForUser(

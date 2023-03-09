@@ -1,3 +1,4 @@
+import { ValidationPipeOptions } from '@nestjs/common';
 import { Request } from 'express';
 import { UserDocument } from './users/schema/user.schema';
 
@@ -27,3 +28,9 @@ export enum TripStatus {
   current = 'current',
   upcoming = 'upcoming',
 }
+
+export const validationPipeOptions: ValidationPipeOptions = {
+  forbidNonWhitelisted: true,
+  whitelist: true,
+  transform: true,
+};

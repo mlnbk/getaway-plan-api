@@ -1,14 +1,15 @@
-import { setTimeout } from 'node:timers/promises';
 import {
   Controller,
   Get,
   NotFoundException,
   Request,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthenticatedRequest } from '../types';
+import { AuthenticatedRequest, validationPipeOptions } from '../types';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { plainToClass } from 'class-transformer';
@@ -16,6 +17,7 @@ import { UserDto } from './dto/user.dto';
 
 @ApiTags('users')
 @Controller('users')
+@UsePipes(new ValidationPipe(validationPipeOptions))
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
