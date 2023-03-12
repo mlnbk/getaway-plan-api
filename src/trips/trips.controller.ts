@@ -1,3 +1,4 @@
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   BadRequestException,
   Body,
@@ -10,20 +11,18 @@ import {
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOkResponse,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiConsumes, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-import { AuthenticatedRequest } from '../types';
+import { AuthenticatedRequest, validationPipeOptions } from '../types';
 import { GetTripsForUserResponse } from './types';
 import { CreateTripDto } from './dto/create-trip.dto';
 import {
@@ -36,6 +35,8 @@ import {
 } from './dto/get-trips-for-user.dto';
 import { TripDto } from './dto/trip.dto';
 
+import { TransformJsonPipe } from 'utils/transform-json.pipe';
+
 import { TripsService } from './trips.service';
 
 @ApiTags('trips')
@@ -45,6 +46,7 @@ export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
 
   @Delete('/:tripId')
+  @UsePipes(new ValidationPipe(validationPipeOptions))
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: DeleteTripResponseDto })
   async deleteTripById(
@@ -70,15 +72,23 @@ export class TripsController {
 
   @Post('/add')
   @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: CreateTripDto })
+  @UseInterceptors(FileInterceptor('tripPic'))
+  @ApiConsumes('multipart/form-data')
   @ApiOkResponse({ type: TripDto })
   async createTrip(
     @Request() request: AuthenticatedRequest,
-    @Body() createTripDto: CreateTripDto,
+    @Body(
+      'tripInfo',
+      new TransformJsonPipe(),
+      new ValidationPipe(validationPipeOptions),
+    )
+    tripInfo: CreateTripDto,
+    @UploadedFile() tripPic: Express.Multer.File,
   ) {
     const tripDocument = await this.tripsService.createTrip(
       request.user._id,
-      createTripDto,
+      tripInfo,
+      tripPic,
     );
     if (!tripDocument) {
       throw new BadRequestException(
@@ -92,6 +102,7 @@ export class TripsController {
 
   @Get('/my-trips')
   @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe(validationPipeOptions))
   @ApiQuery({ type: GetTripsForUserDto })
   @ApiOkResponse({ type: GetTripsForUserResponse })
   async getTripsForUser(

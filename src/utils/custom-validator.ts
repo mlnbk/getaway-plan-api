@@ -10,7 +10,7 @@ export function IsNonPrimitiveArray(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any) {
-          if (!Array.isArray(value)) {
+          if (!Array.isArray(value) || value.length === 0) {
             return false;
           }
           for (const element of value) {

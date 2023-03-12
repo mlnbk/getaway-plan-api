@@ -20,10 +20,5 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false
   },
-  "include": [
-    "src",
-    "commitlint.config.ts",
-    "test.util.ts",
-    "test/app.e2e-spec.ts"
-  ]
+  "include": ["src", "commitlint.config.ts", "utils/*", "test/app.e2e-spec.ts"]
 }

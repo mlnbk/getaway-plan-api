@@ -4,9 +4,10 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Expose, Type } from 'class-transformer';
+import { Expose, plainToClass, Transform, Type } from 'class-transformer';
 
 import { IsNonPrimitiveArray } from '../../utils/custom-validator';
 
@@ -17,12 +18,14 @@ export class CreateTripDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @Expose()
   name?: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @Expose()
   description?: string;
 
@@ -47,6 +50,11 @@ export class CreateTripDto {
 
   @ApiProperty({ type: [DestinationDto] })
   @ValidateNested({ each: true })
+  @Transform((destinations) => {
+    return destinations.value.map((destination: any) =>
+      plainToClass(DestinationDto, destination),
+    );
+  })
   @IsNonPrimitiveArray()
   @Type(() => DestinationDto)
   @Expose()

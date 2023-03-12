@@ -1,25 +1,48 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { DeleteResult } from 'mongodb';
 
-import { CreateTripDto } from './dto/create-trip.dto';
 import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
-import { Trip, TripDocument } from './schema/trip.schema';
 import { TripStatus } from '../types';
+
+import { S3Util } from 'utils/s3.util';
+
+import { CreateTripDto } from './dto/create-trip.dto';
+import { Trip, TripDocument } from './schema/trip.schema';
 
 @Injectable()
 export class TripsService {
-  constructor(@InjectModel(Trip.name) private tripModel: Model<TripDocument>) {}
+  s3Util: S3Util;
+  constructor(
+    @InjectModel(Trip.name) private readonly tripModel: Model<TripDocument>,
+    private readonly configService: ConfigService,
+  ) {
+    this.s3Util = new S3Util();
+  }
 
   async createTrip(
     userId: string,
     trip: CreateTripDto,
+    tripPic?: Express.Multer.File,
   ): Promise<TripDocument | null> {
-    return this.tripModel.create({
+    const createParameters: any = {
       ...trip,
       user: new Types.ObjectId(userId),
-    });
+    };
+    if (tripPic) {
+      const uploadResult = await this.s3Util.upload({
+        Bucket: this.configService.get('S3_PICTURES_BUCKET') ?? '',
+        file: tripPic,
+      });
+      if (uploadResult) {
+        createParameters.pictures = [];
+        createParameters.pictures.push(uploadResult);
+      }
+    }
+
+    return this.tripModel.create(createParameters);
   }
 
   async deleteTrip(tripId: string): Promise<DeleteResult> {
