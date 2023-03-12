@@ -1,3 +1,4 @@
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   BadRequestException,
   Body,
@@ -11,20 +12,12 @@ import {
   Query,
   Request,
   UploadedFile,
-  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiOkResponse,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiConsumes, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -42,9 +35,9 @@ import {
 } from './dto/get-trips-for-user.dto';
 import { TripDto } from './dto/trip.dto';
 
-import { TripsService } from './trips.service';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { TransformJsonPipe } from 'utils/transform-json.pipe';
+
+import { TripsService } from './trips.service';
 
 @ApiTags('trips')
 @Controller('trips')

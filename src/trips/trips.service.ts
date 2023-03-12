@@ -7,10 +7,10 @@ import { DeleteResult } from 'mongodb';
 import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
 import { TripStatus } from '../types';
 
+import { S3Util } from 'utils/s3.util';
+
 import { CreateTripDto } from './dto/create-trip.dto';
 import { Trip, TripDocument } from './schema/trip.schema';
-
-import { S3Util } from 'utils/s3.util';
 
 @Injectable()
 export class TripsService {
@@ -36,7 +36,6 @@ export class TripsService {
         Bucket: this.configService.get('S3_PICTURES_BUCKET') ?? '',
         file: tripPic,
       });
-      console.log('uploadResult', uploadResult);
       if (uploadResult) {
         createParameters.pictures = [];
         createParameters.pictures.push(uploadResult);

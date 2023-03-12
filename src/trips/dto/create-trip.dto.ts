@@ -4,6 +4,7 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import { Expose, plainToClass, Transform, Type } from 'class-transformer';
@@ -17,12 +18,14 @@ export class CreateTripDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @Expose()
   name?: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @Expose()
   description?: string;
 

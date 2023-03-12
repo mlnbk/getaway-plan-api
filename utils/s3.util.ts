@@ -4,10 +4,6 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import {
-  getSignedUrl,
-  S3RequestPresigner,
-} from '@aws-sdk/s3-request-presigner';
 
 interface IUpload {
   Bucket: string;
@@ -29,7 +25,6 @@ export class S3Util {
 
   async upload({ Bucket, file }: IUpload) {
     try {
-      console.log(process.env);
       const parameters: PutObjectCommandInput = {
         Bucket: Bucket,
         Key: file.originalname,
@@ -44,35 +39,8 @@ export class S3Util {
     }
   }
 
-  // async downloadFileFromS3(
-  //   key: string,
-  // ): Promise<S3.GetObjectOutput | undefined> {
-  //   try {
-  //     const s3Parameters: S3.Types.GetObjectRequest = {
-  //       Bucket: 'your-bucket-name',
-  //       Key: key,
-  //     };
-
-  //     return this.s3.getObject(s3Parameters).promise();
-  //   } catch (error) {
-  //     this.logger.error('S3 Util download error', { error });
-  //   }
-  // }
-
-  // async deleteFileFromS3(key: string): Promise<void> {
-  //   try {
-  //     const s3Parameters: S3.Types.DeleteObjectRequest = {
-  //       Bucket: 'your-bucket-name',
-  //       Key: key,
-  //     };
-
-  //     await this.s3.deleteObject(s3Parameters).promise();
-  //   } catch (error) {
-  //     this.logger.error('S3 Util delete error', { error });
-  //   }
-  // }
-
   private getUrl(bucket: string, filename: string) {
-    return `https://${bucket}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${filename}`;
+    const transformedFilename = filename.replace(' ', '+');
+    return `https://${bucket}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${transformedFilename}`;
   }
 }
