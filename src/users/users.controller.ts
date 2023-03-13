@@ -8,12 +8,14 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
+
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { AuthenticatedRequest, validationPipeOptions } from '../types';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UsersService } from './users.service';
-import { plainToClass } from 'class-transformer';
 import { UserDto } from './dto/user.dto';
+
+import { UsersService } from './users.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -31,7 +33,6 @@ export class UsersController {
     if (!foundUser) {
       throw new NotFoundException('User document not found');
     }
-    // FIXME base64 encode-decode
     const transformedUser = plainToClass(UserDto, foundUser.toObject(), {
       excludeExtraneousValues: true,
     });

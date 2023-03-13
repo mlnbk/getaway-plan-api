@@ -8,10 +8,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
-import { UsersController } from './users/users.controller';
-import { UsersModule } from './users/users.module';
+import { CacheModule } from './cache/cache.module';
 import { TripsController } from './trips/trips.controller';
 import { TripsModule } from './trips/trips.module';
+import { UsersController } from './users/users.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -28,14 +29,15 @@ import { TripsModule } from './trips/trips.module';
       inject: [ConfigService],
     }),
     AuthModule,
-    UsersModule,
+    CacheModule,
     TripsModule,
+    UsersModule,
   ],
   controllers: [
     AppController,
     AuthController,
-    UsersController,
     TripsController,
+    UsersController,
   ],
   providers: [
     AppService,
