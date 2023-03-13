@@ -6,6 +6,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -37,13 +38,19 @@ import { TripDto } from './dto/trip.dto';
 
 import { TransformJsonPipe } from 'utils/transform-json.pipe';
 
+import { CacheService } from '../cache/cache.service';
 import { TripsService } from './trips.service';
 
 @ApiTags('trips')
 @Controller('trips')
 @UseGuards(JwtAuthGuard)
 export class TripsController {
-  constructor(private readonly tripsService: TripsService) {}
+  private readonly logger = new Logger(TripsController.name);
+
+  constructor(
+    private readonly cacheService: CacheService,
+    private readonly tripsService: TripsService,
+  ) {}
 
   @Delete('/:tripId')
   @UsePipes(new ValidationPipe(validationPipeOptions))
@@ -95,6 +102,7 @@ export class TripsController {
         `Creating trip failed for user: ${request.user._id}`,
       );
     }
+    await this.cacheService.invalidateKeys(`*${request.user._id}*`);
     return plainToClass(TripDto, tripDocument.toObject(), {
       excludeExtraneousValues: true,
     });
@@ -113,6 +121,12 @@ export class TripsController {
     @Query('asc') asc: boolean,
     @Query('filters') filters?: GetTripsForUserFiltersDto,
   ) {
+    const cacheKey = `home:${request.user._id}:skip=${skip}:limit=${limit}`; // NOTE: sorting and filtering params should be added to the key later when the feature is implemented
+    const result = await this.cacheService.getItem(cacheKey);
+    if (result) {
+      return result;
+    }
+
     const tripDocumentsResponse = await this.tripsService.getTripsForUser({
       userId: request.user._id,
       filters,
@@ -120,7 +134,7 @@ export class TripsController {
       limit,
     });
 
-    return {
+    const getTripsResponse = {
       trips: tripDocumentsResponse.trips.map((tripDocument) =>
         plainToClass(TripDto, tripDocument.toObject(), {
           excludeExtraneousValues: true,
@@ -129,5 +143,8 @@ export class TripsController {
       total: tripDocumentsResponse.total,
       hasMore: tripDocumentsResponse.hasMore,
     };
+
+    await this.cacheService.setItem(cacheKey, getTripsResponse);
+    return getTripsResponse;
   }
 }
