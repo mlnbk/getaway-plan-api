@@ -120,11 +120,11 @@ To use the Redis caching functionality, you will need to set the following envir
 
 The cacheService provides the following methods:
 
-`getAllKeys()`: retrieves all the keys stored in Redis
-`getItem(key: string)`: retrieves the cached data for the specified key, or undefined if the key doesn't exist
-`setItem(key: string, value: any, expiration?: number)`: stores the specified data under the given key in Redis, with an optional expiration time which overrides the expiration time set in the corresponding environmental variable
-`invalidateKeys(pattern: string)`: deletes all keys matching the specified pattern
-`flushAll()`: deletes all keys in Redis
+* `getAllKeys()`: retrieves all the keys stored in Redis
+* `getItem(key: string)`: retrieves the cached data for the specified key, or undefined if the key doesn't exist
+* `setItem(key: string, value: any, expiration?: number)`: stores the specified data under the given key in Redis, with an optional expiration time which overrides the expiration time set in the corresponding environmental variable
+* `invalidateKeys(pattern: string)`: deletes all keys matching the specified pattern
+* `flushAll()`: deletes all keys in Redis
 
 Please note that the cacheService uses JSON.stringify and JSON.parse to serialize and deserialize the cached data, so the data should be JSON-serializable.
 
@@ -136,10 +136,10 @@ This application uses AWS S3 to store trip pictures. The S3Util class provides a
 
 The S3Util requires the following environment variables to be set:
 
-`AWS_S3_ACCESS_KEY`: The access key for the AWS S3 account.
-`AWS_S3_SECRET_KEY`: The secret access key for the AWS S3 account.
-`AWS_S3_REGION`: The AWS region where the S3 bucket is located.
-`S3_PICTURES_BUCKET`: The name of the S3 bucket where trip pictures will be stored.
+* `AWS_S3_ACCESS_KEY`: The access key for the AWS S3 account.
+* `AWS_S3_SECRET_KEY`: The secret access key for the AWS S3 account.
+* `AWS_S3_REGION`: The AWS region where the S3 bucket is located.
+* `S3_PICTURES_BUCKET`: The name of the S3 bucket where trip pictures will be stored.
 
 ## Usage
 
