@@ -20,7 +20,7 @@ async function bootstrap() {
     methods: 'GET, DELETE, POST, PUT',
     allowedHeaders: 'Content-Type, Authorization',
   });
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 5000);
 }
 // eslint-disable-next-line unicorn/prefer-top-level-await
 bootstrap();
