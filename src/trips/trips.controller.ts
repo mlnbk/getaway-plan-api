@@ -18,6 +18,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiConsumes, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 
@@ -49,6 +50,7 @@ export class TripsController {
 
   constructor(
     private readonly cacheService: CacheService,
+    private readonly configServie: ConfigService,
     private readonly tripsService: TripsService,
   ) {}
 
@@ -74,6 +76,7 @@ export class TripsController {
         `Deleting trip failed for user: ${request.user._id}, and trip ID: ${tripId}`,
       );
     }
+    await this.cacheService.invalidateKeys(`*${request.user._id}*`);
     return { ok: true };
   }
 
@@ -92,6 +95,17 @@ export class TripsController {
     tripInfo: CreateTripDto,
     @UploadedFile() tripPic: Express.Multer.File,
   ) {
+    const maxAllowedFileSize =
+      this.configServie.get<number>('maxAllowedFileSize') ?? 0;
+    if (tripPic.mimetype !== 'image/jpeg' && tripPic.mimetype !== 'image/png') {
+      throw new BadRequestException(
+        'The uploaded file does not have the expected format.',
+      );
+    } else if (tripPic.size > maxAllowedFileSize) {
+      throw new BadRequestException(
+        `The uploaded file's size exceeds the allowed filesize.`,
+      );
+    }
     const tripDocument = await this.tripsService.createTrip(
       request.user._id,
       tripInfo,
