@@ -1,4 +1,5 @@
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Types } from 'mongoose';
 import {
   BadRequestException,
   Body,
@@ -20,7 +21,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiConsumes, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { plainToClass, Type } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -35,16 +36,15 @@ import {
   GetTripsForUserDto,
   GetTripsForUserFiltersDto,
 } from './dto/get-trips-for-user.dto';
+import { GetTripRequestDto } from './dto/get-trip.dto';
 import { TripsForUserDto } from './dto/trips-for-user.dto';
 import { TripDto } from './dto/trip.dto';
+import { User } from '../users/schema/user.schema';
 
 import { TransformJsonPipe } from 'utils/transform-json.pipe';
 
 import { CacheService } from '../cache/cache.service';
 import { TripsService } from './trips.service';
-import { GetTripRequestDto } from './dto/get-trip.dto';
-import { Types } from 'mongoose';
-import { User } from 'src/users/schema/user.schema';
 
 @ApiTags('trips')
 @Controller('trips')
