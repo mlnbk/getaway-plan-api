@@ -6,11 +6,12 @@ import { DeleteResult } from 'mongodb';
 
 import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
 import { TripStatus } from '../types';
+import { CreateTripDto } from './dto/create-trip.dto';
+import { Trip, TripDocument } from './schema/trip.schema';
 
 import { S3Util } from 'utils/s3.util';
 
-import { CreateTripDto } from './dto/create-trip.dto';
-import { Trip, TripDocument } from './schema/trip.schema';
+import { LocationsService } from '../locations/locations.service';
 
 @Injectable()
 export class TripsService {
@@ -18,6 +19,7 @@ export class TripsService {
   constructor(
     @InjectModel(Trip.name) private readonly tripModel: Model<TripDocument>,
     private readonly configService: ConfigService,
+    private readonly locationsService: LocationsService,
   ) {
     this.s3Util = new S3Util();
   }
@@ -39,6 +41,14 @@ export class TripsService {
       if (uploadResult) {
         createParameters.pictures = [];
         createParameters.pictures.push(uploadResult);
+      }
+    } else {
+      const countryDocument = await this.locationsService.getCountryDoc(
+        trip.destinations[0].country,
+      );
+      if (countryDocument) {
+        createParameters.pictures = [];
+        createParameters.pictures.push(countryDocument.imageURL);
       }
     }
 

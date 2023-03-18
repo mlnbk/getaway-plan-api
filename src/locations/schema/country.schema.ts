@@ -8,6 +8,9 @@ export class Country {
 
   @Prop({ required: true })
   name!: string;
+
+  @Prop()
+  imageURL?: string;
 }
 
 export type CountryDocument = HydratedDocument<Country>;

@@ -27,9 +27,15 @@ export class LocationsService {
     return this.countryModel.insertMany(countries);
   }
 
-  async getCitiesForCountry(country: string) {
-    return this.cityModel.find({
-      $or: [{ country }, { countryCode: country }],
-    });
+  async getCountryDoc(country: string) {
+    return this.countryModel.findOne({ country });
+  }
+
+  async getCountries() {
+    return this.countryModel.find({});
+  }
+
+  async getCitiesForCountryCode(countryCode: string) {
+    return this.cityModel.find({ countryCode });
   }
 }
