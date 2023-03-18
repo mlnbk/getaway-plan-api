@@ -28,7 +28,7 @@ export class LocationsService {
   }
 
   async getCountryDoc(country: string) {
-    return this.countryModel.findOne({ country });
+    return this.countryModel.findOne({ name: country });
   }
 
   async getCountries() {

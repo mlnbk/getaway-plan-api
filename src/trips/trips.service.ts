@@ -46,9 +46,9 @@ export class TripsService {
       const countryDocument = await this.locationsService.getCountryDoc(
         trip.destinations[0].country,
       );
-      if (countryDocument) {
+      if (countryDocument?.imageUrl) {
         createParameters.pictures = [];
-        createParameters.pictures.push(countryDocument.imageURL);
+        createParameters.pictures.push(countryDocument.imageUrl);
       }
     }
 

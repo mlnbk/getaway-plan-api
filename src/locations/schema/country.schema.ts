@@ -10,7 +10,7 @@ export class Country {
   name!: string;
 
   @Prop()
-  imageURL?: string;
+  imageUrl?: string;
 }
 
 export type CountryDocument = HydratedDocument<Country>;
