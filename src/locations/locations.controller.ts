@@ -177,7 +177,7 @@ export class LocationsController {
     return getCountriesResponse;
   }
 
-  @Get('/country/cities')
+  @Get('/cities')
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe(validationPipeOptions))
   @ApiOkResponse({ type: [CityDto] })
