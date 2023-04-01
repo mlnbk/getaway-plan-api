@@ -56,22 +56,57 @@ export class LocationsController {
     await this.cacheService.setItem(seedKey, request.user._id, 60);
 
     const countriesUrl = this.configServie.get('countriesUrl');
+    const countryImageBaseUrl = this.configServie.get('countryImageUrl');
     const citiesUrl = this.configServie.get('citiesUrl');
-    if (!countriesUrl || !citiesUrl) {
-      throw new BadRequestException(
-        'No URL available to fetch country/city data from.',
-      );
-    }
+    const cityApiUser = this.configServie.get('GEONAMES_USERNAME');
+    const pexelsAccessKey = this.configServie.get('PEXELS_API_KEY');
     try {
+      if (!countriesUrl || !citiesUrl) {
+        throw new BadRequestException(
+          'No URL available to fetch country/city data from.',
+        );
+      }
+      if (!cityApiUser) {
+        throw new BadRequestException(
+          'No username available for geonames.org API.',
+        );
+      }
+      if (!countryImageBaseUrl || !pexelsAccessKey) {
+        throw new BadRequestException(
+          'No env vars available for stock image fetching.',
+        );
+      }
       const countryDataResponse = await fetch(countriesUrl);
       if (!countryDataResponse) return;
       const countryData = await countryDataResponse.json();
       const transformedCountries: CountryDto[] = [];
       const transformedCities: CityDto[] = [];
       for (const country of countryData?.data) {
+        const countryImageResponse = await fetch(
+          `${countryImageBaseUrl}?query=${country.name}&per_page=1`,
+          {
+            headers: {
+              authorization: pexelsAccessKey,
+            },
+          },
+        );
+        let countryImageUrl: string | undefined;
+        if (countryImageResponse) {
+          try {
+            const countryImageData = await countryImageResponse.json();
+            countryImageUrl =
+              countryImageData?.photos?.[0].src?.landscape ?? undefined;
+          } catch (error) {
+            this.logger.error(
+              'Error while parsing country image url response',
+              error,
+            );
+          }
+        }
         const countryDto = plainToClass(CountryDto, {
           name: country.name,
           code: country.Iso2,
+          imageUrl: countryImageUrl,
         });
         const errors = await validate(countryDto);
         if (errors.length > 0) {
@@ -81,19 +116,17 @@ export class LocationsController {
           );
         } else {
           transformedCountries.push(countryDto);
-
-          const cityDataResponse = await fetch(citiesUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ iso2: country.Iso2 }),
-          });
+          const cityDataResponse = await fetch(
+            `${citiesUrl}&username=${cityApiUser}&country=${country.Iso2}`,
+          );
           try {
             const cityData = await cityDataResponse.json();
-            for (const city of cityData.data) {
+            const filteredCityData = cityData?.geonames?.filter(
+              (city: any) => city.countryCode === country.Iso2,
+            );
+            for (const city of filteredCityData) {
               const cityDto = plainToClass(CityDto, {
-                name: city,
+                name: city.name,
                 countryCode: country.Iso2,
               });
               const errors = await validate(cityDto);
@@ -122,19 +155,41 @@ export class LocationsController {
     }
   }
 
-  @Get('/country/cities')
+  @Get('/countries')
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe(validationPipeOptions))
-  @ApiOkResponse({ type: [CityDto] })
-  async getCitiesForCountry(@Query() getCitiesDto: GetCitiesForCountryDto) {
-    const cacheKey = `locations:${getCitiesDto.country}:cities`;
+  @ApiOkResponse({ type: [CountryDto] })
+  async getCountries() {
+    const cacheKey = 'locations:countries';
     const cacheResult = await this.cacheService.getItem(cacheKey);
     if (cacheResult) {
       return cacheResult;
     }
 
-    const cities = await this.locationsService.getCitiesForCountry(
-      getCitiesDto.country,
+    const countries = await this.locationsService.getCountries();
+    const getCountriesResponse = countries.map((country) =>
+      plainToClass(CountryDto, country.toObject(), {
+        excludeExtraneousValues: true,
+      }),
+    );
+
+    await this.cacheService.setItem(cacheKey, getCountriesResponse);
+    return getCountriesResponse;
+  }
+
+  @Get('/cities')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe(validationPipeOptions))
+  @ApiOkResponse({ type: [CityDto] })
+  async getCitiesForCountry(@Query() getCitiesDto: GetCitiesForCountryDto) {
+    const cacheKey = `locations:${getCitiesDto.countryCode}:cities`;
+    const cacheResult = await this.cacheService.getItem(cacheKey);
+    if (cacheResult) {
+      return cacheResult;
+    }
+
+    const cities = await this.locationsService.getCitiesForCountryCode(
+      getCitiesDto.countryCode,
     );
 
     const getCitiesResponse = cities.map((city) =>

@@ -63,6 +63,7 @@ export class CreateTripDto {
   @ApiProperty()
   @IsOptional()
   @ValidateNested()
+  @Transform((budget) => plainToClass(BudgetDto, budget.value))
   @Type(() => BudgetDto)
   @Expose()
   budget?: BudgetDto;

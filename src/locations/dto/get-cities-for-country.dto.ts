@@ -1,10 +1,9 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class GetCitiesForCountryDto {
   @IsString()
-  @MinLength(2)
-  @MaxLength(50)
+  @Length(2)
   @Expose()
-  country!: string;
+  countryCode!: string;
 }

@@ -1,35 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class BudgetDto {
   @ApiProperty()
   @IsOptional()
-  @IsNumber()
+  @IsNotEmpty()
   @Expose()
-  total?: number;
+  total!: string;
 
   @ApiProperty()
   @IsOptional()
-  @IsNumber()
+  @IsNotEmpty()
   @Expose()
-  accomodation?: number;
+  accomodation?: string;
 
   @ApiProperty()
   @IsOptional()
-  @IsNumber()
+  @IsNotEmpty()
   @Expose()
-  transportation?: number;
+  transportation?: string;
 
   @ApiProperty()
   @IsOptional()
-  @IsNumber()
+  @IsNotEmpty()
   @Expose()
-  food?: number;
+  food?: string;
 
   @ApiProperty()
   @IsOptional()
-  @IsNumber()
+  @IsNotEmpty()
   @Expose()
-  activites?: number;
+  activites?: string;
 }

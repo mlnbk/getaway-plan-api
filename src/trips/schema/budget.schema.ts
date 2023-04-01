@@ -3,19 +3,19 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 @Schema({ _id: false })
 export class Budget {
   @Prop()
-  total?: number;
+  total!: string;
 
   @Prop()
-  accomodation?: number;
+  accomodation?: string;
 
   @Prop()
-  transportation?: number;
+  transportation?: string;
 
   @Prop()
-  food?: number;
+  food?: string;
 
   @Prop()
-  activites?: number;
+  activites?: string;
 }
 
 export const BudgetSchema = SchemaFactory.createForClass(Budget);

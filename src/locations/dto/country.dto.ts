@@ -1,4 +1,11 @@
-import { IsString, Length, MaxLength, MinLength } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class CountryDto {
@@ -12,4 +19,9 @@ export class CountryDto {
   @Length(2)
   @Expose()
   code!: string;
+
+  @IsOptional()
+  @IsUrl()
+  @Expose()
+  imageUrl?: string;
 }
