@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  getawayplan-api:
+    image: mlnbk/getawayplan-api:0.1
+    container_name: getawayplan-api
+    restart: always
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+    networks:
+      - traefik-public
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.backend=getawayplan-api'
+      - 'traefik.http.routers.getawayplan-api.rule=Host(`api.getaway-plan.com`)'
+      - 'traefik.http.routers.getawayplan-api.tls.certresolver=myresolver'
+      - 'traefik.http.services.getawayplan-api.loadbalancer.server.port=5000'
+
+  redis:
+    image: redis:alpine3.17
+    networks:
+      - traefik-public
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:
+    driver: local
+
+networks:
+  traefik-public:
+    external: true
