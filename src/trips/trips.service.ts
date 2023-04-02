@@ -91,6 +91,8 @@ export class TripsService {
       }
       if (queries.length > 0) {
         query.$or?.push({ $or: queries });
+      } else {
+        delete query.$or;
       }
 
       if (status?.length) {
@@ -118,7 +120,6 @@ export class TripsService {
       }
     }
 
-    // eslint-disable-next-line unicorn/no-array-callback-reference
     const trips = await this.tripModel.find(
       query,
       {},
