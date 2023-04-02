@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-// eslint-disable-next-line unicorn/prefer-module, @typescript-eslint/no-var-requires
-const sgMail = require('@sendgrid/mail');
+import * as sgMail from '@sendgrid/mail';
 
 import { SendEmailProperties } from './types';
 
