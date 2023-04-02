@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   getawayplan-api:
-    image: mlnbk/getawayplan-api:0.3
+    image: mlnbk/getawayplan-api:0.4
     container_name: getawayplan-api
     restart: always
     env_file:
