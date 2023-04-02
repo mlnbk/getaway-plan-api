@@ -16,6 +16,9 @@ export type JwtPayload = {
   roles: Role[];
 };
 
+export const passwordRegex =
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Za-z]{8,}$/;
+
 export type RequestWithUser = Request & { user: UserDocument };
 
 export enum Role {

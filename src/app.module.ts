@@ -17,6 +17,7 @@ import { TripsController } from './trips/trips.controller';
 import { TripsModule } from './trips/trips.module';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     LocationsModule,
     TripsModule,
     UsersModule,
+    MailModule,
   ],
   controllers: [
     AppController,

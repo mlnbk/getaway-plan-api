@@ -31,5 +31,5 @@ export class BudgetDto {
   @IsOptional()
   @IsNotEmpty()
   @Expose()
-  activites?: string;
+  activities?: string;
 }

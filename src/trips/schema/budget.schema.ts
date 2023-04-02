@@ -15,7 +15,7 @@ export class Budget {
   food?: string;
 
   @Prop()
-  activites?: string;
+  activities?: string;
 }
 
 export const BudgetSchema = SchemaFactory.createForClass(Budget);

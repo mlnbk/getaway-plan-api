@@ -19,6 +19,12 @@ export class User {
 
   @Prop({ type: Array, required: true, enum: Role })
   roles!: Role[];
+
+  @Prop()
+  verifyToken?: string;
+
+  @Prop({ default: false })
+  verified!: boolean;
 }
 
 export type UserDocument = HydratedDocument<User>;
