@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 import configuration from './configuration';
 
@@ -21,6 +23,10 @@ import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      // eslint-disable-next-line unicorn/prefer-module
+      rootPath: join(__dirname, '..', '../public'),
+    }),
     ConfigModule.forRoot({
       load: [configuration],
     }),
