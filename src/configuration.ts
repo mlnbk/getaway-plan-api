@@ -4,4 +4,5 @@ export default () => ({
   countriesUrl: 'https://countriesnow.space/api/v0.1/countries/iso',
   countryImageUrl: 'https://api.pexels.com/v1/search',
   maxAllowedFileSize: 10_000_000,
+  sendgridSenderMail: 'info@getaway-plan.com',
 });

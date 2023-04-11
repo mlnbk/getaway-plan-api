@@ -97,12 +97,13 @@ export class TripsController {
       new ValidationPipe(validationPipeOptions),
     )
     tripInfo: CreateTripDto,
-    @UploadedFile() tripPic?: Express.Multer.File,
+    @UploadedFile() userTripPic?: Express.Multer.File,
   ) {
-    if (tripPic) {
+    let tripPic: Express.Multer.File | string | undefined;
+    if (userTripPic) {
       const maxAllowedFileSize =
         this.configServie.get<number>('maxAllowedFileSize') ?? 0;
-      const { mimetype, size } = tripPic;
+      const { mimetype, size } = userTripPic;
       if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
         throw new BadRequestException(
           'The uploaded file does not have the expected format.',
@@ -112,6 +113,9 @@ export class TripsController {
           `The uploaded file's size exceeds the allowed filesize.`,
         );
       }
+      tripPic = userTripPic;
+    } else if (tripInfo.tripPic) {
+      tripPic = tripInfo.tripPic;
     }
     const tripDocument = await this.tripsService.createTrip(
       request.user._id,

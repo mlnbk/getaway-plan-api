@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
-import { DeleteResult } from 'mongodb';
 
 import { GetTripsForUserParameters, GetTripsForUserResponse } from './types';
 import { TripStatus } from '../types';
@@ -11,15 +10,12 @@ import { Trip, TripDocument } from './schema/trip.schema';
 
 import { S3Util } from 'utils/s3.util';
 
-import { LocationsService } from '../locations/locations.service';
-
 @Injectable()
 export class TripsService {
   s3Util: S3Util;
   constructor(
     @InjectModel(Trip.name) private readonly tripModel: Model<TripDocument>,
     private readonly configService: ConfigService,
-    private readonly locationsService: LocationsService,
   ) {
     this.s3Util = new S3Util();
   }
@@ -27,39 +23,35 @@ export class TripsService {
   async createTrip(
     userId: string,
     trip: CreateTripDto,
-    tripPic?: Express.Multer.File,
-  ): Promise<TripDocument | null> {
+    tripPic?: Express.Multer.File | string,
+  ) {
     const createParameters: any = {
       ...trip,
       user: new Types.ObjectId(userId),
     };
     if (tripPic) {
-      const uploadResult = await this.s3Util.upload({
-        Bucket: this.configService.get('S3_PICTURES_BUCKET') ?? '',
-        file: tripPic,
-      });
-      if (uploadResult) {
-        createParameters.pictures = [];
-        createParameters.pictures.push(uploadResult);
-      }
-    } else {
-      const countryDocument = await this.locationsService.getCountryDoc(
-        trip.destinations[0].country,
-      );
-      if (countryDocument?.imageUrl) {
-        createParameters.pictures = [];
-        createParameters.pictures.push(countryDocument.imageUrl);
+      createParameters.pictures = [];
+      if (typeof tripPic === 'string') {
+        createParameters.pictures.push(tripPic);
+      } else {
+        const uploadResult = await this.s3Util.upload({
+          Bucket: this.configService.get('S3_PICTURES_BUCKET') ?? '',
+          file: tripPic,
+        });
+        if (uploadResult) {
+          createParameters.pictures.push(uploadResult);
+        }
       }
     }
 
     return this.tripModel.create(createParameters);
   }
 
-  async deleteTrip(tripId: string): Promise<DeleteResult> {
+  async deleteTrip(tripId: string) {
     return this.tripModel.deleteOne({ _id: new Types.ObjectId(tripId) });
   }
 
-  async getTripById(tripId: string): Promise<TripDocument | null> {
+  async getTripById(tripId: string) {
     return this.tripModel.findById(new Types.ObjectId(tripId));
   }
 

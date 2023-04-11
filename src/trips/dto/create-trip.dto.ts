@@ -4,6 +4,7 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  IsUrl,
   MinLength,
   ValidateNested,
 } from 'class-validator';
@@ -28,6 +29,12 @@ export class CreateTripDto {
   @MinLength(1)
   @Expose()
   description?: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsUrl()
+  @Expose()
+  tripPic?: string;
 
   @ApiProperty()
   @IsOptional()

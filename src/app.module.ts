@@ -13,8 +13,6 @@ import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from './cache/cache.module';
-import { LocationsModule } from './locations/locations.module';
-import { LocationsController } from './locations/locations.controller';
 import { TripsController } from './trips/trips.controller';
 import { TripsModule } from './trips/trips.module';
 import { UsersController } from './users/users.controller';
@@ -43,7 +41,6 @@ import { MailModule } from './mail/mail.module';
     }),
     AuthModule,
     CacheModule,
-    LocationsModule,
     TripsModule,
     UsersModule,
     MailModule,
@@ -51,7 +48,6 @@ import { MailModule } from './mail/mail.module';
   controllers: [
     AppController,
     AuthController,
-    LocationsController,
     TripsController,
     UsersController,
   ],
